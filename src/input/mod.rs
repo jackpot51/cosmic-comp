@@ -35,6 +35,8 @@ use calloop::{
 use cosmic_comp_config::{NumlockState, workspace::WorkspaceLayout};
 use cosmic_settings_config::shortcuts;
 use cosmic_settings_config::shortcuts::action::{Direction, ResizeDirection};
+#[cfg(feature = "libinput")]
+use smithay::backend::reexports::input::Device as InputDevice;
 use smithay::{
     backend::input::{
         AbsolutePositionEvent, Axis, AxisSource, Device, DeviceCapability, GestureBeginEvent,
@@ -56,9 +58,7 @@ use smithay::{
         touch::{DownEvent, MotionEvent as TouchMotionEvent, UpEvent},
     },
     output::Output,
-    reexports::{
-        input::Device as InputDevice, wayland_server::protocol::wl_shm::Format as ShmFormat,
-    },
+    reexports::wayland_server::protocol::wl_shm::Format as ShmFormat,
     utils::{Point, Rectangle, SERIAL_COUNTER, Serial},
     wayland::{
         image_copy_capture::{BufferConstraints, CursorSessionRef},
@@ -893,12 +893,15 @@ impl State {
                 }
             }
             InputEvent::PointerAxis { event, .. } => {
+                #[cfg(feature = "libinput")]
                 let scroll_factor =
                     if let Some(device) = <dyn Any>::downcast_ref::<InputDevice>(&event.device()) {
                         self.common.config.scroll_factor(device)
                     } else {
                         1.0
                     };
+                #[cfg(not(feature = "libinput"))]
+                let scroll_factor = 1.0;
 
                 let maybe_seat = self
                     .common
@@ -1014,6 +1017,7 @@ impl State {
                         // Decide on action if first update
                         if first_update {
                             let mut natural_scroll = false;
+                            #[cfg(feature = "libinput")]
                             if let Some(scroll_config) =
                                 &self.common.config.cosmic_conf.input_touchpad.scroll_config
                             {
@@ -2373,6 +2377,7 @@ fn mapped_output_for_device<'a, D: Device + 'static>(
     shell: &'a Shell,
     device: &D,
 ) -> Option<&'a Output> {
+    #[cfg(feature = "libinput")]
     let map_to_output = if let Some(device) = <dyn Any>::downcast_ref::<InputDevice>(device) {
         config
             .map_to_output(device)
@@ -2380,5 +2385,7 @@ fn mapped_output_for_device<'a, D: Device + 'static>(
     } else {
         None
     };
+    #[cfg(not(feature = "libinput"))]
+    let map_to_output = None;
     map_to_output.or_else(|| shell.builtin_output())
 }

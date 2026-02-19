@@ -8,6 +8,8 @@ use crate::{
     input::{ModifiersShortcutQueue, SupressedButtons, SupressedKeys},
     state::State,
 };
+#[cfg(feature = "libinput")]
+use smithay::reexports::input::Device as InputDevice;
 use smithay::{
     backend::input::{Device, DeviceCapability},
     desktop::utils::bbox_from_surface_tree,
@@ -17,7 +19,7 @@ use smithay::{
         pointer::{CursorImageAttributes, CursorImageStatus},
     },
     output::Output,
-    reexports::{input::Device as InputDevice, wayland_server::DisplayHandle},
+    reexports::wayland_server::DisplayHandle,
     utils::{Buffer, IsAlive, Monotonic, Point, Rectangle, Serial, Time, Transform},
     wayland::compositor::with_states,
 };
@@ -113,6 +115,7 @@ impl Devices {
         map.insert(id, caps);
 
         if device.has_capability(DeviceCapability::Keyboard) {
+            #[cfg(feature = "libinput")]
             if let Some(device) = <dyn Any>::downcast_ref::<InputDevice>(device) {
                 let mut device = device.clone();
                 device.led_update(led_state.into());
@@ -130,9 +133,12 @@ impl Devices {
     pub fn remove_device<D: Device>(&self, device: &D) -> Vec<DeviceCapability> {
         let id = device.id();
 
-        let mut keyboards = self.keyboards.borrow_mut();
-        if let Some(idx) = keyboards.iter().position(|x| x.id() == id) {
-            keyboards.remove(idx);
+        #[cfg(feature = "libinput")]
+        {
+            let mut keyboards = self.keyboards.borrow_mut();
+            if let Some(idx) = keyboards.iter().position(|x| x.id() == id) {
+                keyboards.remove(idx);
+            }
         }
 
         let mut map = self.capabilities.borrow_mut();
@@ -144,6 +150,7 @@ impl Devices {
     }
 
     pub fn update_led_state(&self, led_state: LedState) {
+        #[cfg(feature = "libinput")]
         for keyboard in self.keyboards.borrow_mut().iter_mut() {
             keyboard.led_update(led_state.into());
         }
@@ -154,6 +161,7 @@ impl Devices {
 pub struct Devices {
     capabilities: RefCell<HashMap<String, Vec<DeviceCapability>>>,
     // Used for updating keyboard leds on kms backend
+    #[cfg(feature = "libinput")]
     keyboards: RefCell<Vec<InputDevice>>,
 }
 

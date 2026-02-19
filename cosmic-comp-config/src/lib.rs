@@ -2,10 +2,13 @@
 
 use cosmic_config::{CosmicConfigEntry, cosmic_config_derive::CosmicConfigEntry};
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "input")]
 use std::collections::HashMap;
 
+#[cfg(feature = "input")]
 use crate::input::TouchpadOverride;
 
+#[cfg(feature = "input")]
 pub mod input;
 #[cfg(feature = "output")]
 pub mod output;
@@ -71,9 +74,13 @@ impl Default for AppearanceConfig {
 pub struct CosmicCompConfig {
     pub workspaces: workspace::WorkspaceConfig,
     pub pinned_workspaces: Vec<workspace::PinnedWorkspace>,
+    #[cfg(feature = "input")]
     pub input_default: input::InputConfig,
+    #[cfg(feature = "input")]
     pub input_touchpad: input::InputConfig,
+    #[cfg(feature = "input")]
     pub input_touchpad_override: TouchpadOverride,
+    #[cfg(feature = "input")]
     pub input_devices: HashMap<String, input::InputConfig>,
     pub xkb_config: XkbConfig,
     pub keyboard_config: KeyboardConfig,
@@ -106,8 +113,10 @@ impl Default for CosmicCompConfig {
         Self {
             workspaces: Default::default(),
             pinned_workspaces: Vec::new(),
+            #[cfg(feature = "input")]
             input_default: Default::default(),
             // By default, enable tap-to-click and disable-while-typing.
+            #[cfg(feature = "input")]
             input_touchpad: input::InputConfig {
                 state: input::DeviceState::Enabled,
                 click_method: Some(input::ClickMethod::Clickfinger),
@@ -120,7 +129,9 @@ impl Default for CosmicCompConfig {
                 }),
                 ..Default::default()
             },
+            #[cfg(feature = "input")]
             input_touchpad_override: Default::default(),
+            #[cfg(feature = "input")]
             input_devices: Default::default(),
             xkb_config: Default::default(),
             keyboard_config: Default::default(),

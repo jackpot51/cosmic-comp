@@ -231,10 +231,7 @@ impl State {
             self.backend
                 .kms()
                 .session
-                .open(
-                    path,
-                    oflags
-                )
+                .open(path, oflags)
                 .with_context(|| {
                     format!(
                         "Failed to optain file descriptor for drm device: {}",
@@ -974,7 +971,8 @@ fn create_output_for_conn(drm: &mut DrmDevice, conn: connector::Handle) -> Resul
     #[cfg(feature = "libdisplay-info")]
     {
         if let Ok(info) = drm_helpers::edid_info(drm, conn)
-            .inspect_err(|err| warn!(?err, "failed to get EDID for {}", interface)) {
+            .inspect_err(|err| warn!(?err, "failed to get EDID for {}", interface))
+        {
             if let Some(make) = info.make() {
                 output.make = make;
             }

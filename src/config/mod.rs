@@ -13,19 +13,17 @@ use cosmic_config::{ConfigGet, CosmicConfigEntry};
 use cosmic_settings_config::window_rules::ApplicationException;
 use cosmic_settings_config::{Shortcuts, shortcuts, window_rules};
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "libinput")]
+pub use smithay::reexports::input::{
+    AccelProfile, ClickMethod, Device as InputDevice, ScrollMethod, SendEventsMode, TapButtonMap,
+};
 use smithay::utils::{Clock, Monotonic};
 use smithay::wayland::xdg_activation::XdgActivationState;
 pub use smithay::{
     backend::input::{self as smithay_input, KeyState},
     input::keyboard::{Keysym, ModifiersState, keysyms as KeySyms},
     output::{Mode, Output},
-    reexports::{
-        calloop::LoopHandle,
-        input::{
-            AccelProfile, ClickMethod, Device as InputDevice, ScrollMethod, SendEventsMode,
-            TapButtonMap,
-        },
-    },
+    reexports::calloop::LoopHandle,
     utils::{Logical, Physical, Point, SERIAL_COUNTER, Size, Transform},
 };
 use std::{
@@ -38,16 +36,18 @@ use std::{
 };
 use tracing::{error, warn};
 
+#[cfg(feature = "libinput")]
 mod input_config;
 pub mod key_bindings;
 mod types;
 
 use cosmic::config::CosmicTk;
 pub use cosmic_comp_config::EdidProduct;
+#[cfg(feature = "libinput")]
+use cosmic_comp_config::input::{DeviceState as InputDeviceState, InputConfig, TouchpadOverride};
 use cosmic_comp_config::{
     AppearanceConfig, CosmicCompConfig, KeyboardConfig, TileBehavior, XkbConfig, XwaylandDescaling,
     XwaylandEavesdropping, ZoomConfig,
-    input::{DeviceState as InputDeviceState, InputConfig, TouchpadOverride},
     output::comp::{
         OutputConfig, OutputInfo, OutputState, OutputsConfig, TransformDef, load_outputs,
     },
@@ -614,11 +614,13 @@ impl Config {
         self.cosmic_conf.xkb_config.clone()
     }
 
+    #[cfg(feature = "libinput")]
     pub fn read_device(&self, device: &mut InputDevice) {
         let (device_config, default_config) = self.get_device_config(device);
         input_config::update_device(device, device_config.as_ref(), default_config);
     }
 
+    #[cfg(feature = "libinput")]
     pub fn scroll_factor(&self, device: &InputDevice) -> f64 {
         let (device_config, default_config) = self.get_device_config(device);
         input_config::get_config(device_config.as_ref(), default_config, |x| {
@@ -627,6 +629,7 @@ impl Config {
         .map_or(1.0, |x| x.0)
     }
 
+    #[cfg(feature = "libinput")]
     pub fn map_to_output(&self, device: &InputDevice) -> Option<String> {
         let (device_config, default_config) = self.get_device_config(device);
         Some(
@@ -637,6 +640,7 @@ impl Config {
         )
     }
 
+    #[cfg(feature = "libinput")]
     fn get_device_config(&self, device: &InputDevice) -> (Option<InputConfig>, &InputConfig) {
         let is_touchpad = device.config_tap_finger_count() > 0;
 
@@ -759,6 +763,7 @@ fn get_config<T: Default + serde::de::DeserializeOwned>(
 
 fn update_input(state: &mut State) {
     if let BackendData::Kms(kms_state) = &mut state.backend {
+        #[cfg(feature = "libinput")]
         for device in kms_state.input_devices.values_mut() {
             state.common.config.read_device(device);
         }
@@ -835,21 +840,25 @@ fn config_changed(config: cosmic_config::Config, keys: Vec<String>, state: &mut 
                 state.common.config.dynamic_conf.numlock_mut().last_state =
                     seat.get_keyboard().unwrap().modifier_state().num_lock;
             }
+            #[cfg(feature = "libinput")]
             "input_default" => {
                 let value = get_config::<InputConfig>(&config, "input_default");
                 state.common.config.cosmic_conf.input_default = value;
                 update_input(state);
             }
+            #[cfg(feature = "libinput")]
             "input_touchpad" => {
                 let value = get_config::<InputConfig>(&config, "input_touchpad");
                 state.common.config.cosmic_conf.input_touchpad = value;
                 update_input(state);
             }
+            #[cfg(feature = "libinput")]
             "input_touchpad_override" => {
                 let value = get_config::<TouchpadOverride>(&config, "input_touchpad_override");
                 state.common.config.cosmic_conf.input_touchpad_override = value;
                 update_input(state)
             }
+            #[cfg(feature = "libinput")]
             "input_devices" => {
                 let value = get_config::<HashMap<String, InputConfig>>(&config, "input_devices");
                 state.common.config.cosmic_conf.input_devices = value;

@@ -13,8 +13,7 @@ members = ["cosmic-comp-config"]
 anyhow = { version = "1.0.100", features = ["backtrace"] }
 bitflags = "2.9.4"
 calloop = { version = "0.14.3", features = ["executor"] }
-cosmic-comp-config = { path = "cosmic-comp-config", features = [
-    #"libdisplay-info",
+cosmic-comp-config = { path = "cosmic-comp-config", default-features = false, features = [
     "output",
 ] }
 cosmic-config = { git = "https://github.com/pop-os/libcosmic/", features = [
@@ -99,12 +98,11 @@ version = "0.7.0"
 default-features = false
 features = [
     "backend_drm",
-    "backend_gbm",
     "backend_egl",
-    "backend_libinput",
+    "backend_gbm",
     "backend_session_libseat",
-    "backend_winit",
     "backend_vulkan",
+    "backend_winit",
     "backend_x11",
     "desktop",
     "renderer_glow",
@@ -121,8 +119,9 @@ optional = true
 
 [features]
 debug = ["egui", "egui_plot", "smithay-egui", "anyhow/backtrace"]
-default = ["libdisplay-info", "systemd", "udev"]
+default = ["libdisplay-info", "libinput", "systemd", "udev"]
 libdisplay-info = ["dep:libdisplay-info", "cosmic-comp-config/libdisplay-info"]
+libinput = ["cosmic-comp-config/input", "smithay/backend_libinput", "udev"]
 systemd = ["libsystemd", "logind-zbus"]
 udev = ["smithay/backend_udev"]
 profile-with-tracy = ["profiling/profile-with-tracy", "tracy-client/default"]

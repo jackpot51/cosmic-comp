@@ -14,13 +14,17 @@ use indexmap::IndexMap;
 use render::gles::GbmGlowBackend;
 #[cfg(feature = "udev")]
 use smithay::backend::udev::{UdevBackend, UdevEvent, primary_gpu};
+#[cfg(feature = "libinput")]
+use smithay::{
+    backend::libinput::{LibinputInputBackend, LibinputSessionInterface},
+    reexports::input::{self, Libinput},
+};
 use smithay::{
     backend::{
         allocator::{Buffer, dmabuf::Dmabuf, format::FormatSet},
         drm::{DrmDeviceFd, DrmNode, NodeType, VrrSupport, output::DrmOutputRenderElements},
         egl::{EGLContext, EGLDevice, EGLDisplay},
         input::InputEvent,
-        libinput::{LibinputInputBackend, LibinputSessionInterface},
         renderer::{glow::GlowRenderer, multigpu::GpuManager},
         session::{Event as SessionEvent, Session, libseat::LibSeatSession},
     },
@@ -31,7 +35,6 @@ use smithay::{
             Device as _,
             control::{Device as _, connector::Interface, crtc},
         },
-        input::{self, Libinput},
         wayland_server::{Client, DisplayHandle},
     },
     utils::{Clock, DevPath, Monotonic, Size},
@@ -64,6 +67,7 @@ use super::render::{CLEAR_COLOR, CursorMode, output_elements};
 #[derive(Debug)]
 pub struct KmsState {
     pub drm_devices: IndexMap<DrmNode, Device>,
+    #[cfg(feature = "libinput")]
     pub input_devices: HashMap<String, input::Device>,
     pub primary_node: Arc<RwLock<Option<DrmNode>>>,
     // Mesa llvmpipe renderer, if supported and there are no render nodes
@@ -71,6 +75,7 @@ pub struct KmsState {
     pub api: GpuManager<GbmGlowBackend<DrmDeviceFd>>,
 
     pub session: LibSeatSession,
+    #[cfg(feature = "libinput")]
     libinput: Libinput,
 
     pub syncobj_state: Option<DrmSyncobjState>,
@@ -83,7 +88,7 @@ pub struct KmsGuard<'a> {
     session: &'a LibSeatSession,
 }
 
-#[cfg(feature = "udev")]
+#[cfg(feature = "libinput")]
 pub fn init_backend(
     dh: &DisplayHandle,
     event_loop: &mut EventLoop<'static, State>,
@@ -177,16 +182,18 @@ pub fn init_backend(
     Ok(())
 }
 
-#[cfg(not(feature = "udev"))]
+#[cfg(not(feature = "libinput"))]
 pub fn init_backend(
     dh: &DisplayHandle,
     event_loop: &mut EventLoop<'static, State>,
     state: &mut State,
 ) -> Result<()> {
-    Err(anyhow::anyhow!("kms backend not functional when udev feature not enabled"))
+    Err(anyhow::anyhow!(
+        "kms backend not functional when libinput or udev features are not enabled"
+    ))
 }
 
-#[cfg(feature = "udev")]
+#[cfg(feature = "libinput")]
 fn init_libinput(
     dh: &DisplayHandle,
     session: &LibSeatSession,
@@ -365,7 +372,7 @@ fn init_udev(
 }
 
 impl State {
-    #[cfg(feature = "udev")]
+    #[cfg(feature = "libinput")]
     fn resume_session(
         &mut self,
         dispatcher: Dispatcher<'static, UdevBackend, Self>,
@@ -435,6 +442,7 @@ impl State {
         loop_signal.wakeup();
     }
 
+    #[cfg(feature = "libinput")]
     fn pause_session(&mut self) {
         let backend = self.backend.kms();
         backend.libinput.suspend();
