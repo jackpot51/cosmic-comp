@@ -62,8 +62,8 @@ time = { version = "0.3.44", features = [
 ] }
 tiny-skia = "0.11"
 tracing = { version = "0.1.41", features = [
-    "max_level_debug",
-    "release_max_level_info",
+    "max_level_trace",
+    "release_max_level_trace",
 ] }
 tracing-journald = "0.3.1"
 tracing-subscriber = { version = "0.3.20", features = [
@@ -150,8 +150,8 @@ cosmic-client-toolkit = { git = "https://github.com/pop-os//cosmic-protocols", b
 [patch.crates-io]
 drm = { git = "https://github.com/jackpot51/drm-rs.git", branch = "develop" }
 drm-ffi = { git = "https://github.com/jackpot51/drm-rs.git", branch = "develop" }
-smithay = { git = "https://github.com/jackpot51/smithay.git", branch = "redox" }
 rustix = { git = "https://github.com/bytecodealliance/rustix" }
+smithay = { git = "https://github.com/jackpot51/smithay.git", branch = "redox" }
 winit = { git = "https://github.com/jackpot51/winit.git", branch = "redox-0.30" }
 zbus = { git = "https://github.com/jackpot51/zbus.git", branch = "redox" }
 # wayland-rs patches using git
@@ -164,3 +164,13 @@ wayland-protocols-misc = { git = "https://github.com/jackpot51/wayland-rs.git", 
 wayland-protocols-wlr = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
 wayland-server = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
 wayland-sys = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
+# wayland-rs patches using path
+#wayland-backend = { path = "../../wayland-rs/source/wayland-backend" }
+#wayland-client = { path = "../../wayland-rs/source/wayland-client" }
+#wayland-cursor = { path = "../../wayland-rs/source/wayland-cursor" }
+#wayland-egl = { path = "../../wayland-rs/source/wayland-egl" }
+#wayland-protocols = { path = "../../wayland-rs/source/wayland-protocols" }
+#wayland-protocols-misc = { path = "../../wayland-rs/source/wayland-protocols-misc" }
+#wayland-protocols-wlr = { path = "../../wayland-rs/source/wayland-protocols-wlr" }
+#wayland-server = { path = "../../wayland-rs/source/wayland-server" }
+#wayland-sys = { path = "../../wayland-rs/source/wayland-sys" }

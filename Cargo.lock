@@ -922,7 +922,7 @@ dependencies = [
 [[package]]
 name = "cosmic-config"
 version = "1.0.0"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "atomicwrites",
  "calloop 0.14.4",
@@ -943,7 +943,7 @@ dependencies = [
 [[package]]
 name = "cosmic-config-derive"
 version = "1.0.0"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "quote",
  "syn 2.0.116",
@@ -1044,7 +1044,7 @@ dependencies = [
 [[package]]
 name = "cosmic-theme"
 version = "1.0.0"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "almost",
  "configparser",
@@ -2349,7 +2349,7 @@ dependencies = [
 [[package]]
 name = "iced"
 version = "0.14.0-dev"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "dnd",
  "iced_core",
@@ -2365,7 +2365,7 @@ dependencies = [
 [[package]]
 name = "iced_core"
 version = "0.14.0-dev"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "bitflags 2.11.0",
  "bytes",
@@ -2388,7 +2388,7 @@ dependencies = [
 [[package]]
 name = "iced_futures"
 version = "0.14.0-dev"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "futures",
  "iced_core",
@@ -2413,7 +2413,7 @@ dependencies = [
 [[package]]
 name = "iced_graphics"
 version = "0.14.0-dev"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "bitflags 2.11.0",
  "bytemuck",
@@ -2435,7 +2435,7 @@ dependencies = [
 [[package]]
 name = "iced_renderer"
 version = "0.14.0-dev"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "iced_graphics",
  "iced_tiny_skia",
@@ -2447,7 +2447,7 @@ dependencies = [
 [[package]]
 name = "iced_runtime"
 version = "0.14.0-dev"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "bytes",
  "dnd",
@@ -2461,7 +2461,7 @@ dependencies = [
 [[package]]
 name = "iced_tiny_skia"
 version = "0.14.0-dev"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "bytemuck",
  "cosmic-text",
@@ -2477,7 +2477,7 @@ dependencies = [
 [[package]]
 name = "iced_wgpu"
 version = "0.14.0-dev"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "as-raw-xcb-connection",
  "bitflags 2.11.0",
@@ -2508,7 +2508,7 @@ dependencies = [
 [[package]]
 name = "iced_widget"
 version = "0.14.0-dev"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "dnd",
  "iced_renderer",
@@ -2988,7 +2988,7 @@ checksum = "6800badb6cb2082ffd7b6a67e6125bb39f18782f793520caee8cb8846be06112"
 [[package]]
 name = "libcosmic"
 version = "1.0.0"
-source = "git+https://github.com/pop-os/libcosmic/#754b064bffbb399b955662d6c1fcca3468accb0c"
+source = "git+https://github.com/pop-os/libcosmic/#c1c09624bd5f46cdcfc042561070bab6faabaffc"
 dependencies = [
  "apply",
  "auto_enums",
@@ -7209,7 +7209,7 @@ dependencies = [
 [[package]]
 name = "zbus"
 version = "5.13.2"
-source = "git+https://github.com/jackpot51/zbus.git?branch=redox#df62072d63483ad77cd16126ba5ca94f033cf911"
+source = "git+https://github.com/jackpot51/zbus.git?branch=redox#91e2ae789459581c387008984998e1c249a5fa8a"
 dependencies = [
  "async-broadcast",
  "async-executor",
@@ -7243,7 +7243,7 @@ dependencies = [
 [[package]]
 name = "zbus_macros"
 version = "5.13.2"
-source = "git+https://github.com/jackpot51/zbus.git?branch=redox#df62072d63483ad77cd16126ba5ca94f033cf911"
+source = "git+https://github.com/jackpot51/zbus.git?branch=redox#91e2ae789459581c387008984998e1c249a5fa8a"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -7257,7 +7257,7 @@ dependencies = [
 [[package]]
 name = "zbus_names"
 version = "4.3.1"
-source = "git+https://github.com/jackpot51/zbus.git?branch=redox#df62072d63483ad77cd16126ba5ca94f033cf911"
+source = "git+https://github.com/jackpot51/zbus.git?branch=redox#91e2ae789459581c387008984998e1c249a5fa8a"
 dependencies = [
  "serde",
  "winnow 0.7.14",
@@ -7369,7 +7369,7 @@ dependencies = [
 [[package]]
 name = "zvariant"
 version = "5.9.2"
-source = "git+https://github.com/jackpot51/zbus.git?branch=redox#df62072d63483ad77cd16126ba5ca94f033cf911"
+source = "git+https://github.com/jackpot51/zbus.git?branch=redox#91e2ae789459581c387008984998e1c249a5fa8a"
 dependencies = [
  "endi",
  "enumflags2",
@@ -7382,7 +7382,7 @@ dependencies = [
 [[package]]
 name = "zvariant_derive"
 version = "5.9.2"
-source = "git+https://github.com/jackpot51/zbus.git?branch=redox#df62072d63483ad77cd16126ba5ca94f033cf911"
+source = "git+https://github.com/jackpot51/zbus.git?branch=redox#91e2ae789459581c387008984998e1c249a5fa8a"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -7394,7 +7394,7 @@ dependencies = [
 [[package]]
 name = "zvariant_utils"
 version = "3.3.0"
-source = "git+https://github.com/jackpot51/zbus.git?branch=redox#df62072d63483ad77cd16126ba5ca94f033cf911"
+source = "git+https://github.com/jackpot51/zbus.git?branch=redox#91e2ae789459581c387008984998e1c249a5fa8a"
 dependencies = [
  "proc-macro2",
  "quote",
