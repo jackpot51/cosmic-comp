@@ -14,7 +14,7 @@ anyhow = { version = "1.0.100", features = ["backtrace"] }
 bitflags = "2.9.4"
 calloop = { version = "0.14.3", features = ["executor"] }
 cosmic-comp-config = { path = "cosmic-comp-config", features = [
-    "libdisplay-info",
+    #"libdisplay-info",
     "output",
 ] }
 cosmic-config = { git = "https://github.com/pop-os/libcosmic/", features = [
@@ -31,7 +31,7 @@ cosmic-settings-daemon-config = { git = "https://github.com/pop-os/cosmic-settin
 cosmic-text = { git = "https://github.com/pop-os/cosmic-text.git", features = [
     "shape-run-cache",
 ] }
-libdisplay-info = "0.3.0"
+libdisplay-info = { version = "0.3.0", optional = true }
 egui = { version = "0.31.1", optional = true }
 egui_plot = { version = "0.31.0", optional = true }
 i18n-embed = { version = "0.16", features = [
@@ -103,7 +103,6 @@ features = [
     "backend_egl",
     "backend_libinput",
     "backend_session_libseat",
-    "backend_udev",
     "backend_winit",
     "backend_vulkan",
     "backend_x11",
@@ -122,8 +121,10 @@ optional = true
 
 [features]
 debug = ["egui", "egui_plot", "smithay-egui", "anyhow/backtrace"]
-default = ["systemd"]
+default = ["libdisplay-info", "systemd", "udev"]
+libdisplay-info = ["dep:libdisplay-info", "cosmic-comp-config/libdisplay-info"]
 systemd = ["libsystemd", "logind-zbus"]
+udev = ["smithay/backend_udev"]
 profile-with-tracy = ["profiling/profile-with-tracy", "tracy-client/default"]
 profile-with-tracy-gpu = ["profile-with-tracy", "smithay/tracy_gpu_profiling"]
 
@@ -148,4 +149,19 @@ cosmic-protocols = { git = "https://github.com/pop-os//cosmic-protocols", branch
 cosmic-client-toolkit = { git = "https://github.com/pop-os//cosmic-protocols", branch = "main" }
 
 [patch.crates-io]
-smithay = { git = "https://github.com/smithay/smithay.git", rev = "3d3f9e3" }
+drm = { git = "https://github.com/jackpot51/drm-rs.git", branch = "develop" }
+drm-ffi = { git = "https://github.com/jackpot51/drm-rs.git", branch = "develop" }
+smithay = { git = "https://github.com/jackpot51/smithay.git", branch = "redox" }
+rustix = { git = "https://github.com/bytecodealliance/rustix" }
+winit = { git = "https://github.com/jackpot51/winit.git", branch = "redox-0.30" }
+zbus = { git = "https://github.com/jackpot51/zbus.git", branch = "redox" }
+# wayland-rs patches using git
+wayland-backend = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
+wayland-client = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
+wayland-cursor = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
+wayland-egl = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
+wayland-protocols = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
+wayland-protocols-misc = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
+wayland-protocols-wlr = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
+wayland-server = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
+wayland-sys = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }

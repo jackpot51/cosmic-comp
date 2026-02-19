@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use anyhow::{Context, Result, anyhow};
+#[cfg(feature = "libdisplay-info")]
 use libdisplay_info::{edid::DisplayDescriptorTag, info::Info};
 use smithay::{
     reexports::drm::control::{
@@ -166,6 +167,7 @@ pub fn interface_name(device: &impl ControlDevice, connector: connector::Handle)
     ))
 }
 
+#[cfg(feature = "libdisplay-info")]
 pub fn edid_info(device: &impl ControlDevice, connector: connector::Handle) -> Result<Info> {
     let edid_prop = get_prop(device, connector, "EDID")?;
     let edid_info = device.get_property(edid_prop)?;
@@ -213,7 +215,7 @@ pub fn get_property_val(
         let info = device.get_property(prop)?;
         if Some(name) == info.name().to_str().ok() {
             let val_type = info.value_type();
-            return Ok((val_type, val));
+            return Ok((val_type.clone(), val));
         }
     }
     anyhow::bail!("No prop found for {}", name)
@@ -243,16 +245,19 @@ pub fn get_minimum_refresh_rate(
     device: &impl ControlDevice,
     connector: connector::Handle,
 ) -> Result<Option<u32>> {
-    let info = edid_info(device, connector)?;
-    let edid = info.edid().context("EDID lacking into")?;
-    for descriptor in edid.display_descriptors() {
-        if descriptor.tag() == DisplayDescriptorTag::RangeLimits {
-            return Ok(Some(
-                descriptor
-                    .range_limits()
-                    .context("Invalid range limits descriptor")?
-                    .min_vert_rate_hz as u32,
-            ));
+    #[cfg(feature = "libdisplay-info")]
+    {
+        let info = edid_info(device, connector)?;
+        let edid = info.edid().context("EDID lacking into")?;
+        for descriptor in edid.display_descriptors() {
+            if descriptor.tag() == DisplayDescriptorTag::RangeLimits {
+                return Ok(Some(
+                    descriptor
+                        .range_limits()
+                        .context("Invalid range limits descriptor")?
+                        .min_vert_rate_hz as u32,
+                ));
+            }
         }
     }
 
@@ -269,7 +274,7 @@ pub fn get_max_bpc(
 
     let info = dev.get_property(handle)?;
     let range = match info.value_type() {
-        property::ValueType::UnsignedRange(x, y) => (x as u32)..(y as u32),
+        property::ValueType::UnsignedRange(x, y) => (*x as u32)..(*y as u32),
         _ => return Err(anyhow!("max bpc has wrong value type")),
     };
 

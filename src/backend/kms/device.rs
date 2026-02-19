@@ -223,13 +223,17 @@ impl State {
             }
         }
 
+        #[cfg(not(target_os = "redox"))]
+        let oflags = OFlags::RDWR | OFlags::CLOEXEC | OFlags::NOCTTY | OFlags::NONBLOCK;
+        #[cfg(target_os = "redox")]
+        let oflags = OFlags::RDWR | OFlags::CLOEXEC | OFlags::NONBLOCK;
         let fd = DrmDeviceFd::new(DeviceFd::from(
             self.backend
                 .kms()
                 .session
                 .open(
                     path,
-                    OFlags::RDWR | OFlags::CLOEXEC | OFlags::NOCTTY | OFlags::NONBLOCK,
+                    oflags
                 )
                 .with_context(|| {
                     format!(
@@ -947,9 +951,6 @@ fn create_output_for_conn(drm: &mut DrmDevice, conn: connector::Handle) -> Resul
         .get_connector(conn, false)
         .with_context(|| "Failed to query connector info")?;
     let interface = drm_helpers::interface_name(drm, conn)?;
-    let edid_info = drm_helpers::edid_info(drm, conn)
-        .inspect_err(|err| warn!(?err, "failed to get EDID for {}", interface))
-        .ok();
     let (phys_w, phys_h) = conn_info.size().unwrap_or((0, 0));
 
     let output = Output::new(
@@ -964,25 +965,33 @@ fn create_output_for_conn(drm: &mut DrmDevice, conn: connector::Handle) -> Resul
                 connector::SubPixel::None => Subpixel::None,
                 _ => Subpixel::Unknown,
             },
-            make: edid_info
-                .as_ref()
-                .and_then(|info| info.make())
-                .unwrap_or_else(|| String::from("Unknown")),
-            model: edid_info
-                .as_ref()
-                .and_then(|info| info.model())
-                .unwrap_or_else(|| String::from("Unknown")),
-            serial_number: edid_info
-                .as_ref()
-                .and_then(|info| info.serial())
-                .unwrap_or_else(|| String::from("Unknown")),
+            make: String::from("Unknown"),
+            model: String::from("Unknown"),
+            serial_number: String::from("Unknown"),
         },
     );
-    if let Some(edid) = edid_info.as_ref().and_then(|x| x.edid()) {
-        output
-            .user_data()
-            .insert_if_missing(|| EdidProduct::from(edid.vendor_product()));
+
+    #[cfg(feature = "libdisplay-info")]
+    {
+        if let Ok(info) = drm_helpers::edid_info(drm, conn)
+            .inspect_err(|err| warn!(?err, "failed to get EDID for {}", interface)) {
+            if let Some(make) = info.make() {
+                output.make = make;
+            }
+            if let Some(model) = info.model() {
+                output.model = model;
+            }
+            if let Some(serial) = info.serial() {
+                output.serial_number = serial;
+            }
+            if let Some(edid) = info.edid() {
+                output
+                    .user_data()
+                    .insert_if_missing(|| EdidProduct::from(edid.vendor_product()));
+            }
+        }
     }
+
     Ok(output)
 }
 

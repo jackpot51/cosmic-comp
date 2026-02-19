@@ -12,6 +12,8 @@ use calloop::LoopSignal;
 use cosmic_comp_config::output::comp::{AdaptiveSync, OutputState};
 use indexmap::IndexMap;
 use render::gles::GbmGlowBackend;
+#[cfg(feature = "udev")]
+use smithay::backend::udev::{UdevBackend, UdevEvent, primary_gpu};
 use smithay::{
     backend::{
         allocator::{Buffer, dmabuf::Dmabuf, format::FormatSet},
@@ -21,7 +23,6 @@ use smithay::{
         libinput::{LibinputInputBackend, LibinputSessionInterface},
         renderer::{glow::GlowRenderer, multigpu::GpuManager},
         session::{Event as SessionEvent, Session, libseat::LibSeatSession},
-        udev::{UdevBackend, UdevEvent, primary_gpu},
     },
     output::Output,
     reexports::{
@@ -82,6 +83,7 @@ pub struct KmsGuard<'a> {
     session: &'a LibSeatSession,
 }
 
+#[cfg(feature = "udev")]
 pub fn init_backend(
     dh: &DisplayHandle,
     event_loop: &mut EventLoop<'static, State>,
@@ -175,6 +177,16 @@ pub fn init_backend(
     Ok(())
 }
 
+#[cfg(not(feature = "udev"))]
+pub fn init_backend(
+    dh: &DisplayHandle,
+    event_loop: &mut EventLoop<'static, State>,
+    state: &mut State,
+) -> Result<()> {
+    Err(anyhow::anyhow!("kms backend not functional when udev feature not enabled"))
+}
+
+#[cfg(feature = "udev")]
 fn init_libinput(
     dh: &DisplayHandle,
     session: &LibSeatSession,
@@ -215,11 +227,16 @@ fn init_libinput(
 }
 
 fn determine_boot_gpu(seat: String) -> Option<DrmNode> {
-    let primary_node = primary_gpu(&seat)
-        .ok()
-        .flatten()
-        .and_then(|x| DrmNode::from_path(x).ok());
-    primary_node.and_then(|x| x.node_with_type(NodeType::Render).and_then(Result::ok))
+    #[cfg(feature = "udev")]
+    {
+        let primary_node = primary_gpu(&seat)
+            .ok()
+            .flatten()
+            .and_then(|x| DrmNode::from_path(x).ok());
+        return primary_node.and_then(|x| x.node_with_type(NodeType::Render).and_then(Result::ok));
+    }
+
+    None
 }
 
 fn determine_primary_gpu(
@@ -285,6 +302,7 @@ fn software_renderer() -> anyhow::Result<GlowRenderer> {
     unsafe { Ok(GlowRenderer::new(context)?) }
 }
 
+#[cfg(feature = "udev")]
 fn init_udev(
     seat: String,
     evlh: &LoopHandle<'static, State>,
@@ -347,6 +365,7 @@ fn init_udev(
 }
 
 impl State {
+    #[cfg(feature = "udev")]
     fn resume_session(
         &mut self,
         dispatcher: Dispatcher<'static, UdevBackend, Self>,
