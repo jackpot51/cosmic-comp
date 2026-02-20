@@ -212,6 +212,22 @@ pub fn init_backend(
             };
         })
         .map_err(|_| anyhow::anyhow!("Failed to init eventloop timer for winit"))?;
+
+    //TODO: why does Redox OS needs a special frame timer?
+    #[cfg(target_os = "redox")]
+    {
+        use calloop::timer::{TimeoutAction, Timer};
+        let event_ping_handle = event_ping.clone();
+        let duration = Duration::from_secs_f64(1000.0 / (mode.refresh as f64));
+        event_loop
+            .handle()
+            .insert_source(Timer::from_duration(duration), move |_, _, _| {
+                event_ping_handle.ping();
+                TimeoutAction::ToDuration(duration)
+            })
+            .map_err(|_| anyhow::anyhow!("Failed to init Redox frame timer for winit"))?;
+    }
+
     event_ping.ping();
 
     state.backend = BackendData::Winit(WinitState {
