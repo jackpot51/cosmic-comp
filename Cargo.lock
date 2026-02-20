@@ -5092,7 +5092,7 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 [[package]]
 name = "smithay"
 version = "0.7.0"
-source = "git+https://github.com/jackpot51/smithay.git?branch=redox#d19948766bc63639edd1e7e65f9ff481e2a45fae"
+source = "git+https://github.com/jackpot51/smithay.git?branch=redox#d9f262c36b0e04df08b34386ffe90ec72a404c1a"
 dependencies = [
  "aliasable",
  "appendlist",
