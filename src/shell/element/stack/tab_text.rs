@@ -85,6 +85,7 @@ impl TabText {
             shaping: Shaping::Advanced,
             line_height: LineHeight::default(),
             wrapping: cosmic::iced::advanced::text::Wrapping::None,
+            ellipsize: cosmic::iced::advanced::text::Ellipsize::None,
         })
     }
 }

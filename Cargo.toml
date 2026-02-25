@@ -148,12 +148,8 @@ cosmic-protocols = { git = "https://github.com/pop-os//cosmic-protocols", branch
 cosmic-client-toolkit = { git = "https://github.com/pop-os//cosmic-protocols", branch = "main" }
 
 [patch.crates-io]
-drm = { git = "https://github.com/jackpot51/drm-rs.git", branch = "develop" }
-drm-ffi = { git = "https://github.com/jackpot51/drm-rs.git", branch = "develop" }
-rustix = { git = "https://github.com/bytecodealliance/rustix" }
 smithay = { git = "https://github.com/jackpot51/smithay.git", branch = "redox" }
 winit = { git = "https://github.com/jackpot51/winit.git", branch = "redox-0.30" }
-zbus = { git = "https://github.com/jackpot51/zbus.git", branch = "redox" }
 # wayland-rs patches using git
 wayland-backend = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
 wayland-client = { git = "https://github.com/jackpot51/wayland-rs.git", branch = "redox" }
