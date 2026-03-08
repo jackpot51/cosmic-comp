@@ -88,7 +88,6 @@ pub struct KmsGuard<'a> {
     session: &'a LibSeatSession,
 }
 
-#[cfg(feature = "libinput")]
 pub fn init_backend(
     dh: &DisplayHandle,
     event_loop: &mut EventLoop<'static, State>,
@@ -98,49 +97,57 @@ pub fn init_backend(
     let (session, notifier) = LibSeatSession::new().context("Failed to acquire session")?;
 
     // setup input
+    #[cfg(feature = "libinput")]
     let libinput_context = init_libinput(dh, &session, &event_loop.handle())
         .context("Failed to initialize libinput backend")?;
 
     // watch for gpu events
+    #[cfg(feature = "udev")]
     let udev_dispatcher = init_udev(session.seat(), &event_loop.handle())
         .context("Failed to initialize udev connection")?;
 
     // handle session events
-    let loop_signal = event_loop.get_signal();
-    let dispatcher = udev_dispatcher.clone();
-    event_loop
-        .handle()
-        .insert_source(notifier, move |event, &mut (), state| match event {
-            SessionEvent::ActivateSession => {
-                state.resume_session(
-                    dispatcher.clone(),
-                    state.common.event_loop_handle.clone(),
-                    loop_signal.clone(),
-                );
-            }
-            SessionEvent::PauseSession => {
-                state.pause_session();
-            }
-        })
-        .map_err(|err| err.error)
-        .context("Failed to initialize session event source")?;
+    #[cfg(feature = "udev")]
+    {
+        let loop_signal = event_loop.get_signal();
+        let dispatcher = udev_dispatcher.clone();
+        event_loop
+            .handle()
+            .insert_source(notifier, move |event, &mut (), state| match event {
+                SessionEvent::ActivateSession => {
+                    state.resume_session(
+                        dispatcher.clone(),
+                        state.common.event_loop_handle.clone(),
+                        loop_signal.clone(),
+                    );
+                }
+                SessionEvent::PauseSession => {
+                    state.pause_session();
+                }
+            })
+            .map_err(|err| err.error)
+            .context("Failed to initialize session event source")?;
+    }
 
     // finish backend initialization
     state.backend = BackendData::Kms(KmsState {
         drm_devices: IndexMap::new(),
+        #[cfg(feature = "libinput")]
         input_devices: HashMap::new(),
         primary_node: Arc::new(RwLock::new(None)),
         software_renderer: None,
         api: GpuManager::new(GbmGlowBackend::new()).context("Failed to initialize gpu backend")?,
 
         session,
+        #[cfg(feature = "libinput")]
         libinput: libinput_context,
 
         syncobj_state: None,
     });
 
     // manually add already present gpus
-    let mut outputs = Vec::new();
+    let mut outputs = Vec::<Output>::new();
+    #[cfg(feature = "udev")]
     for (dev, path) in udev_dispatcher.as_source_ref().device_list() {
         match state.device_added(dev, path, dh) {
             Ok(added) => outputs.extend(added),
@@ -180,17 +187,6 @@ pub fn init_backend(
     state.launch_xwayland(primary);
 
     Ok(())
-}
-
-#[cfg(not(feature = "libinput"))]
-pub fn init_backend(
-    dh: &DisplayHandle,
-    event_loop: &mut EventLoop<'static, State>,
-    state: &mut State,
-) -> Result<()> {
-    Err(anyhow::anyhow!(
-        "kms backend not functional when libinput or udev features are not enabled"
-    ))
 }
 
 #[cfg(feature = "libinput")]
