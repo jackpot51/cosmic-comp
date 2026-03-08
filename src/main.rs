@@ -2,7 +2,7 @@
 
 fn main() {
     if let Err(err) = cosmic_comp::run(Default::default()) {
-        tracing::error!("Error occured in main(): {}", err);
+        tracing::error!("Error occured in main(): {:?}", err);
         std::process::exit(1);
     }
 }
